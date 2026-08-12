@@ -1,6 +1,12 @@
 # Widget de costos Azure
 
-Ventanita flotante para Windows que muestra el costo acumulado del mes de la suscripción de Azure: total, promedio diario, proyección a fin de mes, barras por día y desglose por servicio.
+Ventanita flotante para Windows que muestra los costos de la suscripción de Azure en tres vistas (pestañas al pie, se recuerda la elegida):
+
+- **Mes** — acumulado del mes: total, promedio diario, proyección a fin de mes y barras por día.
+- **12 meses** — barras por mes del último año con promedio mensual.
+- **Todo** — histórico completo (la API solo deja 12 meses por consulta, así que se junta por bloques anuales).
+
+Cada vista trae su desglose por servicio.
 
 ## Cómo funciona
 
