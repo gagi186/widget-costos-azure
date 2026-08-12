@@ -72,7 +72,7 @@ if (Test-Path $cacheFile) {
     if ($c.vista -in @('mes','meses','todo')) { $script:vista = $c.vista }
     if ($c.json) {
       $tmp = $c.json | ConvertFrom-Json
-      if ($tmp.mes -and $tmp.meses -and $tmp.diaSvc) { $sync.json = $c.json; $sync.fresh = $true }
+      if ($tmp.mes -and $tmp.meses -and $tmp.diaMet) { $sync.json = $c.json; $sync.fresh = $true }
     }
   } catch {}
 }
@@ -106,6 +106,7 @@ function Agrupa-Servicios($pares) {
 }
 
 function Nuevo-MenuDetalle([string]$titulo, $items) {
+  # $items: filas {n=servicio, m=medidor, c=costo} del periodo de la barra
   $cm = New-Object Windows.Controls.ContextMenu
   $t = New-Object Windows.Controls.MenuItem
   $t.Header = $titulo
@@ -113,14 +114,29 @@ function Nuevo-MenuDetalle([string]$titulo, $items) {
   $t.IsHitTestVisible = $false
   [void]$cm.Items.Add($t)
   [void]$cm.Items.Add((New-Object Windows.Controls.Separator))
-  $lista = @($items | Where-Object { [double]$_.c -ge 0.005 } | Sort-Object -Property c -Descending)
-  $top = @($lista | Select-Object -First 8)
+  $porSvc = @{}
+  foreach ($f in @($items)) {
+    $n = [string]$f.n
+    if (-not $porSvc.ContainsKey($n)) { $porSvc[$n] = 0.0 }
+    $porSvc[$n] += [double]$f.c
+  }
+  $svcs = @($porSvc.GetEnumerator() | ForEach-Object { [pscustomobject]@{ n = $_.Key; c = $_.Value } } |
+    Where-Object { $_.c -ge 0.005 } | Sort-Object -Property c -Descending)
+  $top = @($svcs | Select-Object -First 8)
   $resto = 0.0
-  foreach ($s in @($lista | Select-Object -Skip 8)) { $resto += [double]$s.c }
+  foreach ($s in @($svcs | Select-Object -Skip 8)) { $resto += $s.c }
   foreach ($s in $top) {
     $mi = New-Object Windows.Controls.MenuItem
-    $mi.Header = ('{0}  —  ${1}' -f $s.n, ([double]$s.c).ToString('N2', $cult))
-    $mi.IsHitTestVisible = $false
+    $mi.Header = ('{0}  —  ${1}' -f $s.n, $s.c.ToString('N2', $cult))
+    $mets = @($items | Where-Object { [string]$_.n -eq $s.n -and [double]$_.c -ge 0.005 } | Sort-Object -Property c -Descending | Select-Object -First 12)
+    foreach ($m in $mets) {
+      $hijo = New-Object Windows.Controls.MenuItem
+      $nom = [string]$m.m; if (-not $nom) { $nom = '—' }
+      $hijo.Header = ('{0}  —  ${1}' -f $nom, ([double]$m.c).ToString('N2', $cult))
+      $hijo.IsHitTestVisible = $false
+      [void]$mi.Items.Add($hijo)
+    }
+    if ($mets.Count -eq 0) { $mi.IsHitTestVisible = $false }
     [void]$cm.Items.Add($mi)
   }
   if ($resto -gt 0.005) {
@@ -213,7 +229,7 @@ function Render($d) {
       $ui.txtSub.Text = ('últimos {0} meses · ~ ${1}/mes' -f $ult.Count, $prom.ToString('N2', $cult))
       Render-Barras @($ult | ForEach-Object {
         $ym = [string]$_.ym
-        [pscustomobject]@{ label = $_.label; c = $_.c; detalle = @($d.mesSvc | Where-Object { [string]$_.ym -eq $ym }) }
+        [pscustomobject]@{ label = $_.label; c = $_.c; detalle = @($d.mesMet | Where-Object { [string]$_.ym -eq $ym }) }
       })
       $yms = @{}; foreach ($m in $ult) { $yms[[string]$m.ym] = $true }
       Render-Servicios (Agrupa-Servicios @($d.mesSvc | Where-Object { $yms.ContainsKey([string]$_.ym) }))
@@ -228,7 +244,7 @@ function Render($d) {
       $ui.txtSub.Text = ('desde {0} · ~ ${1}/mes' -f $desde, $prom.ToString('N2', $cult))
       Render-Barras @($tods | Select-Object -Last 40 | ForEach-Object {
         $ym = [string]$_.ym
-        [pscustomobject]@{ label = $_.label; c = $_.c; detalle = @($d.mesSvc | Where-Object { [string]$_.ym -eq $ym }) }
+        [pscustomobject]@{ label = $_.label; c = $_.c; detalle = @($d.mesMet | Where-Object { [string]$_.ym -eq $ym }) }
       })
       Render-Servicios (Agrupa-Servicios @($d.mesSvc))
     }
@@ -243,7 +259,7 @@ function Render($d) {
       }
       Render-Barras @($d.mes.daily | ForEach-Object {
         $k = [string]$_.k
-        [pscustomobject]@{ label = $_.d; c = $_.c; detalle = @($d.diaSvc | Where-Object { [string]$_.k -eq $k }) }
+        [pscustomobject]@{ label = $_.d; c = $_.c; detalle = @($d.diaMet | Where-Object { [string]$_.k -eq $k }) }
       })
       Render-Servicios @($d.mes.services)
     }
@@ -295,29 +311,29 @@ $fetchScript = {
       dataset = @{
         granularity = 'Daily'
         aggregation = @{ totalCost = @{ name = 'Cost'; function = 'Sum' } }
-        grouping = @(@{ type = 'Dimension'; name = 'ServiceName' })
+        grouping = @(@{ type = 'Dimension'; name = 'ServiceName' }, @{ type = 'Dimension'; name = 'Meter' })
       }
     } | ConvertTo-Json -Depth 8
     $resp = Invoke-CostApi $bodyMes
-    $porDia = @{}; $porSvc = @{}; $porDiaSvc = @{}; $tot = 0.0
+    $porDia = @{}; $porSvc = @{}; $porDiaMet = @{}; $tot = 0.0
     foreach ($r in $resp.properties.rows) {
-      $costo = [double]$r[0]; $fecha = [string][long]$r[1]; $svc = [string]$r[2]
-      if ($r[3]) { $cur = [string]$r[3] }
+      $costo = [double]$r[0]; $fecha = [string][long]$r[1]; $svc = [string]$r[2]; $met = [string]$r[3]
+      if ($r[4]) { $cur = [string]$r[4] }
       $tot += $costo
       if (-not $porDia.ContainsKey($fecha)) { $porDia[$fecha] = 0.0 }
       $porDia[$fecha] += $costo
       if (-not $porSvc.ContainsKey($svc)) { $porSvc[$svc] = 0.0 }
       $porSvc[$svc] += $costo
-      $kds = $fecha + '|' + $svc
-      if (-not $porDiaSvc.ContainsKey($kds)) { $porDiaSvc[$kds] = 0.0 }
-      $porDiaSvc[$kds] += $costo
+      $kdm = $fecha + '|' + $svc + '|' + $met
+      if (-not $porDiaMet.ContainsKey($kdm)) { $porDiaMet[$kdm] = 0.0 }
+      $porDiaMet[$kdm] += $costo
     }
     $daily = @($porDia.Keys | Sort-Object | ForEach-Object {
       @{ k = $_; d = ([int]$_.Substring(6, 2)).ToString() + ' de ' + (Get-Date).ToString('MMM', $cult); c = [Math]::Round($porDia[$_], 4) }
     })
-    $diaSvc = @($porDiaSvc.Keys | ForEach-Object {
-      $partes = $_.Split('|', 2)
-      @{ k = $partes[0]; n = $partes[1]; c = [Math]::Round($porDiaSvc[$_], 4) }
+    $diaMet = @($porDiaMet.Keys | ForEach-Object {
+      $partes = $_.Split('|', 3)
+      @{ k = $partes[0]; n = $partes[1]; m = $partes[2]; c = [Math]::Round($porDiaMet[$_], 4) }
     })
     $services = @($porSvc.GetEnumerator() | Sort-Object -Property Value -Descending | ForEach-Object {
       @{ n = $_.Key; c = [Math]::Round($_.Value, 4) }
@@ -325,7 +341,7 @@ $fetchScript = {
 
     $hoy = Get-Date
     $iniMesActual = Get-Date -Year $hoy.Year -Month $hoy.Month -Day 1 -Hour 0 -Minute 0 -Second 0
-    $porMes = @{}; $porMesSvc = @{}
+    $porMes = @{}; $porMesSvc = @{}; $porMesMet = @{}
     for ($b = 0; $b -lt 10; $b++) {
       $fin = if ($b -eq 0) { $hoy } else { $iniMesActual.AddMonths(-12 * $b).AddDays(-1) }
       $ini = $iniMesActual.AddMonths(-11 - 12 * $b)
@@ -335,7 +351,7 @@ $fetchScript = {
         dataset = @{
           granularity = 'Monthly'
           aggregation = @{ totalCost = @{ name = 'Cost'; function = 'Sum' } }
-          grouping = @(@{ type = 'Dimension'; name = 'ServiceName' })
+          grouping = @(@{ type = 'Dimension'; name = 'ServiceName' }, @{ type = 'Dimension'; name = 'Meter' })
         }
       } | ConvertTo-Json -Depth 8
       $respH = $null
@@ -344,14 +360,17 @@ $fetchScript = {
       foreach ($r in $respH.properties.rows) {
         $costo = [double]$r[0]
         $dt = [datetime]::Parse([string]$r[1], [cultureinfo]::InvariantCulture)
-        $svc = [string]$r[2]
-        if ($r[3]) { $cur = [string]$r[3] }
+        $svc = [string]$r[2]; $met = [string]$r[3]
+        if ($r[4]) { $cur = [string]$r[4] }
         $ym = $dt.ToString('yyyy-MM')
         if (-not $porMes.ContainsKey($ym)) { $porMes[$ym] = 0.0 }
         $porMes[$ym] += $costo
         $k = $ym + '|' + $svc
         if (-not $porMesSvc.ContainsKey($k)) { $porMesSvc[$k] = 0.0 }
         $porMesSvc[$k] += $costo
+        $km = $ym + '|' + $svc + '|' + $met
+        if (-not $porMesMet.ContainsKey($km)) { $porMesMet[$km] = 0.0 }
+        $porMesMet[$km] += $costo
         $n++
       }
       if ($n -eq 0) { break }
@@ -364,11 +383,15 @@ $fetchScript = {
       $partes = $_.Split('|', 2)
       @{ ym = $partes[0]; n = $partes[1]; c = [Math]::Round($porMesSvc[$_], 4) }
     })
+    $mesMet = @($porMesMet.Keys | ForEach-Object {
+      $partes = $_.Split('|', 3)
+      @{ ym = $partes[0]; n = $partes[1]; m = $partes[2]; c = [Math]::Round($porMesMet[$_], 4) }
+    })
 
     $sync.json = (@{
       currency = $cur; at = (Get-Date).ToString('HH:mm')
       mes = @{ total = [Math]::Round($tot, 4); daily = $daily; services = $services }
-      meses = $meses; mesSvc = $mesSvc; diaSvc = $diaSvc
+      meses = $meses; mesSvc = $mesSvc; diaMet = $diaMet; mesMet = $mesMet
     } | ConvertTo-Json -Depth 8)
     $sync.fresh = $true
   } catch {
