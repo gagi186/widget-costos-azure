@@ -10,7 +10,7 @@ Tres vistas (pestañas al pie, se recuerda la elegida):
 - **12 meses** — barras por mes del último año con promedio mensual.
 - **Todo** — histórico completo (la API solo deja 12 meses por consulta, así que se junta por bloques anuales).
 
-Cada vista trae su desglose por servicio. La ventana se arrastra con el mouse, recuerda su posición, y se actualiza sola cada 4 horas (botón ⟳ para refrescar a mano).
+Cada vista trae su desglose por servicio, y con **clic derecho sobre cualquier barra** ves qué servicios se cobraron en ese periodo (el día en la vista Mes, el mes en las otras). La ventana se arrastra con el mouse, recuerda su posición, y se actualiza sola cada 4 horas (botón ⟳ para refrescar a mano).
 
 ## Requisitos
 

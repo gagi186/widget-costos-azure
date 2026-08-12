@@ -72,7 +72,7 @@ if (Test-Path $cacheFile) {
     if ($c.vista -in @('mes','meses','todo')) { $script:vista = $c.vista }
     if ($c.json) {
       $tmp = $c.json | ConvertFrom-Json
-      if ($tmp.mes -and $tmp.meses) { $sync.json = $c.json; $sync.fresh = $true }
+      if ($tmp.mes -and $tmp.meses -and $tmp.diaSvc) { $sync.json = $c.json; $sync.fresh = $true }
     }
   } catch {}
 }
@@ -105,6 +105,39 @@ function Agrupa-Servicios($pares) {
   @($lista | Sort-Object -Property c -Descending)
 }
 
+function Nuevo-MenuDetalle([string]$titulo, $items) {
+  $cm = New-Object Windows.Controls.ContextMenu
+  $t = New-Object Windows.Controls.MenuItem
+  $t.Header = $titulo
+  $t.FontWeight = 'Bold'
+  $t.IsHitTestVisible = $false
+  [void]$cm.Items.Add($t)
+  [void]$cm.Items.Add((New-Object Windows.Controls.Separator))
+  $lista = @($items | Where-Object { [double]$_.c -ge 0.005 } | Sort-Object -Property c -Descending)
+  $top = @($lista | Select-Object -First 8)
+  $resto = 0.0
+  foreach ($s in @($lista | Select-Object -Skip 8)) { $resto += [double]$s.c }
+  foreach ($s in $top) {
+    $mi = New-Object Windows.Controls.MenuItem
+    $mi.Header = ('{0}  —  ${1}' -f $s.n, ([double]$s.c).ToString('N2', $cult))
+    $mi.IsHitTestVisible = $false
+    [void]$cm.Items.Add($mi)
+  }
+  if ($resto -gt 0.005) {
+    $mi = New-Object Windows.Controls.MenuItem
+    $mi.Header = ('Otros  —  ${0}' -f $resto.ToString('N2', $cult))
+    $mi.IsHitTestVisible = $false
+    [void]$cm.Items.Add($mi)
+  }
+  if ($top.Count -eq 0) {
+    $mi = New-Object Windows.Controls.MenuItem
+    $mi.Header = 'Sin cargos'
+    $mi.IsHitTestVisible = $false
+    [void]$cm.Items.Add($mi)
+  }
+  $cm
+}
+
 function Render-Barras($items) {
   $ui.pnlBarras.Children.Clear()
   $items = @($items)
@@ -121,6 +154,9 @@ function Render-Barras($items) {
     $r.VerticalAlignment = 'Bottom'
     $r.Margin = New-Object Windows.Thickness(1, 0, 1, 0)
     $r.ToolTip = ('{0} · ${1}' -f $it.label, ([double]$it.c).ToString('N2', $cult))
+    if ($it.PSObject.Properties['detalle']) {
+      $r.ContextMenu = Nuevo-MenuDetalle ('{0} · ${1}' -f $it.label, ([double]$it.c).ToString('N2', $cult)) $it.detalle
+    }
     [void]$ui.pnlBarras.Children.Add($r)
   }
 }
@@ -175,7 +211,10 @@ function Render($d) {
       $ui.txtTotal.Text = & $totalTxt $tot
       $prom = $tot / [Math]::Max(1, $ult.Count)
       $ui.txtSub.Text = ('últimos {0} meses · ~ ${1}/mes' -f $ult.Count, $prom.ToString('N2', $cult))
-      Render-Barras $ult
+      Render-Barras @($ult | ForEach-Object {
+        $ym = [string]$_.ym
+        [pscustomobject]@{ label = $_.label; c = $_.c; detalle = @($d.mesSvc | Where-Object { [string]$_.ym -eq $ym }) }
+      })
       $yms = @{}; foreach ($m in $ult) { $yms[[string]$m.ym] = $true }
       Render-Servicios (Agrupa-Servicios @($d.mesSvc | Where-Object { $yms.ContainsKey([string]$_.ym) }))
     }
@@ -187,7 +226,10 @@ function Render($d) {
       $prom = $tot / [Math]::Max(1, $tods.Count)
       $desde = if ($tods.Count -gt 0) { [string]$tods[0].label } else { '—' }
       $ui.txtSub.Text = ('desde {0} · ~ ${1}/mes' -f $desde, $prom.ToString('N2', $cult))
-      Render-Barras @($tods | Select-Object -Last 40)
+      Render-Barras @($tods | Select-Object -Last 40 | ForEach-Object {
+        $ym = [string]$_.ym
+        [pscustomobject]@{ label = $_.label; c = $_.c; detalle = @($d.mesSvc | Where-Object { [string]$_.ym -eq $ym }) }
+      })
       Render-Servicios (Agrupa-Servicios @($d.mesSvc))
     }
     default {
@@ -199,7 +241,10 @@ function Render($d) {
         $enMes = [DateTime]::DaysInMonth((Get-Date).Year, (Get-Date).Month)
         $ui.txtSub.Text = ('~ ${0}/día · proyección ${1}' -f $prom.ToString('N2', $cult), ($prom * $enMes).ToString('N0', $cult))
       }
-      Render-Barras @($d.mes.daily | ForEach-Object { [pscustomobject]@{ label = $_.d; c = $_.c } })
+      Render-Barras @($d.mes.daily | ForEach-Object {
+        $k = [string]$_.k
+        [pscustomobject]@{ label = $_.d; c = $_.c; detalle = @($d.diaSvc | Where-Object { [string]$_.k -eq $k }) }
+      })
       Render-Servicios @($d.mes.services)
     }
   }
@@ -254,7 +299,7 @@ $fetchScript = {
       }
     } | ConvertTo-Json -Depth 8
     $resp = Invoke-CostApi $bodyMes
-    $porDia = @{}; $porSvc = @{}; $tot = 0.0
+    $porDia = @{}; $porSvc = @{}; $porDiaSvc = @{}; $tot = 0.0
     foreach ($r in $resp.properties.rows) {
       $costo = [double]$r[0]; $fecha = [string][long]$r[1]; $svc = [string]$r[2]
       if ($r[3]) { $cur = [string]$r[3] }
@@ -263,9 +308,16 @@ $fetchScript = {
       $porDia[$fecha] += $costo
       if (-not $porSvc.ContainsKey($svc)) { $porSvc[$svc] = 0.0 }
       $porSvc[$svc] += $costo
+      $kds = $fecha + '|' + $svc
+      if (-not $porDiaSvc.ContainsKey($kds)) { $porDiaSvc[$kds] = 0.0 }
+      $porDiaSvc[$kds] += $costo
     }
     $daily = @($porDia.Keys | Sort-Object | ForEach-Object {
-      @{ d = ([int]$_.Substring(6, 2)).ToString() + ' de ' + (Get-Date).ToString('MMM', $cult); c = [Math]::Round($porDia[$_], 4) }
+      @{ k = $_; d = ([int]$_.Substring(6, 2)).ToString() + ' de ' + (Get-Date).ToString('MMM', $cult); c = [Math]::Round($porDia[$_], 4) }
+    })
+    $diaSvc = @($porDiaSvc.Keys | ForEach-Object {
+      $partes = $_.Split('|', 2)
+      @{ k = $partes[0]; n = $partes[1]; c = [Math]::Round($porDiaSvc[$_], 4) }
     })
     $services = @($porSvc.GetEnumerator() | Sort-Object -Property Value -Descending | ForEach-Object {
       @{ n = $_.Key; c = [Math]::Round($_.Value, 4) }
@@ -316,7 +368,7 @@ $fetchScript = {
     $sync.json = (@{
       currency = $cur; at = (Get-Date).ToString('HH:mm')
       mes = @{ total = [Math]::Round($tot, 4); daily = $daily; services = $services }
-      meses = $meses; mesSvc = $mesSvc
+      meses = $meses; mesSvc = $mesSvc; diaSvc = $diaSvc
     } | ConvertTo-Json -Depth 8)
     $sync.fresh = $true
   } catch {
