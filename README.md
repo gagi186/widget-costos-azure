@@ -44,3 +44,7 @@ wscript.exe "C:\ruta\al\repo\lanzar.vbs"
 - No guarda credenciales: usa el token que le da Azure CLI en el momento.
 - Si aparece "Sin sesión de Azure", corre `az login` y refresca.
 - Licencia [MIT](LICENSE).
+
+---
+
+Hecho por [BIGOLD](https://bigold.com.mx) 🥇
