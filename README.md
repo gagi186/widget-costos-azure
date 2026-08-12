@@ -1,5 +1,7 @@
 # Widget de costos Azure
 
+![Widget de costos Azure](docs/captura.png)
+
 Ventanita flotante para Windows que muestra los costos de tu suscripción de Azure, sin instalar nada: solo PowerShell (que ya viene en Windows) y Azure CLI.
 
 Tres vistas (pestañas al pie, se recuerda la elegida):
