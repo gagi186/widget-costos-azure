@@ -179,13 +179,10 @@ function Render-Barras($items) {
 
 function Render-Servicios($svcs) {
   $ui.pnlServicios.Children.Clear()
-  $svcs = @($svcs | Where-Object { [double]$_.c -ge 0.005 })
-  $top = @($svcs | Select-Object -First 4)
-  $resto = 0.0
-  foreach ($s in @($svcs | Select-Object -Skip 4)) { $resto += [double]$s.c }
-  $filas = @()
-  foreach ($s in $top) { $filas += [pscustomobject]@{ n = [string]$s.n; c = [double]$s.c } }
-  if ($resto -gt 0.005) { $filas += [pscustomobject]@{ n = 'Otros'; c = $resto } }
+  # Todos los servicios que redondean a 1 centavo o más, sin agrupar en «Otros».
+  $filas = @($svcs | Where-Object { [double]$_.c -ge 0.005 } |
+    ForEach-Object { [pscustomobject]@{ n = [string]$_.n; c = [double]$_.c } } |
+    Sort-Object -Property c -Descending)
   $maxSvc = 0.0
   foreach ($s in $filas) { if ($s.c -gt $maxSvc) { $maxSvc = $s.c } }
   if ($maxSvc -le 0) { $maxSvc = 1 }
