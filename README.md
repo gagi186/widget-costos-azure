@@ -19,24 +19,31 @@ Cada vista trae su desglose por servicio, y con **clic derecho sobre cualquier b
 
 ## Uso
 
+### Recomendado: instalador (sin VBScript)
+
+Clic derecho en `instalar.ps1` → **Ejecutar con PowerShell**, o desde una consola:
+
+```
+powershell -ExecutionPolicy Bypass -File instalar.ps1
+```
+
+Crea el acceso directo **Costos Azure** en el Escritorio y en la carpeta Inicio (arranca solo al iniciar sesión; usa `-SinInicio` si no lo quieres). Además desbloquea los archivos si se descargaron de Internet y borra accesos viejos que apuntaban a `lanzar.vbs`.
+
+La primera consulta tarda un poco (la API de Cost Management limita peticiones seguido; el widget reintenta solo).
+
+### Alternativa: `lanzar.vbs`
+
 ```
 wscript lanzar.vbs
 ```
 
-Eso abre el widget sin ventana de consola. La primera consulta tarda un poco (la API de Cost Management limita peticiones seguido; el widget reintenta solo).
-
-### Auto-arranque al iniciar sesión
-
-Crea un acceso directo en la carpeta Inicio (`Win+R` → `shell:startup`) con destino:
-
-```
-wscript.exe "C:\ruta\al\repo\lanzar.vbs"
-```
+Abre el widget sin ventana de consola. **Ojo:** Windows 11 está retirando VBScript; si al abrir el `.vbs` sale *«El formato de información de enlace de la aplicación no es válido»* u otro error, usa el instalador de arriba.
 
 ## Archivos
 
 - `CostosAzureWidget.ps1` — todo el widget: UI en WPF y consultas a la API de Cost Management usando el token de tu sesión de `az`. **Guardado en UTF-8 con BOM** — si se pierde el BOM, PowerShell 5.1 lo lee como ANSI y los acentos salen rotos.
-- `lanzar.vbs` — lanzador sin consola.
+- `instalar.ps1` — crea los accesos directos (Escritorio e Inicio) sin depender de VBScript.
+- `lanzar.vbs` — lanzador sin consola (requiere VBScript).
 - `cache.json` (se genera solo) — últimos datos, posición de la ventana y vista elegida; permite pintar al instante al arrancar.
 
 ## Notas
