@@ -302,7 +302,7 @@ function buildIndex(){
 let INDEX = null;
 function viewBuscar(){
   const q = store.get('q','');
-  return `<h2>¿Qué me toca?</h2><div class="search"><input id="q" type="search" placeholder="Escribe un nombre o apellido (ej. Morales)" value="${esc(q)}" autocomplete="off"></div><div id="res"></div>`;
+  return `<h2>¿Qué me toca?</h2><div class="search"><input id="q" type="search" placeholder="Escribe un nombre o apellido" value="${esc(q)}" autocomplete="off"></div><div id="res"></div>`;
 }
 function runSearch(q){
   store.set('q', q);
