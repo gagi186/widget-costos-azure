@@ -1,6 +1,6 @@
 // Service worker: guarda la app completa para usarla sin internet.
 // Al cambiar data.js o index.html, suba el número de versión.
-const CACHE = 'campamento-2026-v1';
+const CACHE = 'campamento-2026-v2';
 const FILES = ['./', './index.html', './data.js', './manifest.webmanifest',
   './icons/icon.svg', './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 
