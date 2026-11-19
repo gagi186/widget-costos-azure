@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campamento 2026</title>
+<meta name="description" content="Programa, rally, comunión.com, deportes y responsables del campamento Tiempo de conquistar 2026.">
+<meta name="theme-color" content="#1f5d3f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Campamento">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+:root{
+  --bg:#f6f3ec; --card:#ffffff; --ink:#1d2a22; --muted:#5d6b62; --line:#e3ddd0;
+  --brand:#1f5d3f; --brand-ink:#ffffff; --accent:#d9822b; --soft:#e8f0ea; --soft2:#fbefe2;
+  --now:#fff4d6; --now-line:#e8b641;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121814; --card:#1b231e; --ink:#e8ede9; --muted:#9db0a4; --line:#2c3830;
+    --brand:#3f9b6c; --brand-ink:#0d1510; --accent:#f0a456; --soft:#22352a; --soft2:#3a2a1a;
+    --now:#3a3218; --now-line:#c99a2e;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:5;background:var(--brand);color:var(--brand-ink);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;gap:10px}
+header h1{font-size:1.05rem;margin:0;flex:1;line-height:1.2}
+header h1 small{display:block;font-weight:400;opacity:.85;font-size:.78rem}
+.iconbtn{background:rgba(255,255,255,.16);border:0;border-radius:999px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;color:inherit}
+.iconbtn svg{width:20px;height:20px}
+main{max-width:760px;margin:0 auto;padding:14px 16px calc(90px + env(safe-area-inset-bottom))}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:5;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+nav.tabs button{flex:1;background:none;border:0;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.7rem;color:var(--muted);cursor:pointer;border-radius:10px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button.on{color:var(--brand);font-weight:600}
+nav.tabs button.on svg{stroke-width:2.4}
+h2{font-size:1.25rem;margin:6px 0 10px}
+h3{font-size:1rem;margin:18px 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-size:.78rem}
+.seg{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:.9rem;white-space:nowrap}
+.seg button.on{background:var(--brand);border-color:var(--brand);color:var(--brand-ink);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.item{display:grid;grid-template-columns:86px 1fr;gap:10px;padding:11px 12px;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.list{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:12px}
+.time{font-variant-numeric:tabular-nums;font-weight:600;font-size:.88rem;color:var(--brand)}
+.time small{display:block;font-weight:400;color:var(--muted)}
+.act{font-weight:600}
+.meta{color:var(--muted);font-size:.88rem;margin-top:2px}
+.desc{font-size:.9rem;margin-top:4px}
+.who{display:inline-flex;align-items:center;gap:4px;font-size:.88rem;margin-top:3px}
+.who svg{width:14px;height:14px;flex:0 0 auto;color:var(--accent)}
+.item.now{background:var(--now);box-shadow:inset 4px 0 0 var(--now-line)}
+.item.past{opacity:.55}
+.badge{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:999px;background:var(--now-line);color:#2b2108;margin-left:6px;vertical-align:middle}
+.link{display:inline-block;margin-top:6px;font-size:.85rem;color:var(--brand);font-weight:600;background:var(--soft);border:0;border-radius:8px;padding:4px 9px;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;cursor:pointer;font-size:.92rem;min-width:84px}
+.chips button.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.num{font-variant-numeric:tabular-nums;font-weight:700;color:var(--brand);white-space:nowrap}
+.vs{color:var(--muted);font-size:.8rem;padding:0 3px}
+.mine{background:var(--soft2)}
+.people{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.people span{background:var(--soft);border-radius:999px;padding:2px 9px;font-size:.82rem}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.cols b{font-size:.72rem;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}
+.num-badge{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:999px;background:var(--accent);color:#fff;font-size:.78rem;font-weight:700;margin-right:6px;padding:0 6px}
+ol.steps{margin:0;padding-left:20px;font-size:.92rem}
+ol.steps li{margin-bottom:6px}
+details.card summary{cursor:pointer;font-weight:600}
+.search{display:flex;gap:8px;margin-bottom:12px}
+.search input{flex:1;font:inherit;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.res-sec{font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);font-weight:700}
+.muted{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+.hero{background:linear-gradient(135deg,var(--brand),#2f7a55);color:#fff;border-radius:16px;padding:16px;margin-bottom:14px}
+.hero .big{font-size:1.3rem;font-weight:700;margin:2px 0}
+.hero .lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;opacity:.85}
+.hero .sub{opacity:.9;font-size:.9rem}
+.hero .next{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.25)}
+.install{display:none;margin-bottom:12px}
+.install.show{display:flex;align-items:center;gap:10px}
+.install p{margin:0;flex:1;font-size:.9rem}
+.install button{border:0;background:var(--accent);color:#fff;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer}
+.offline{font-size:.78rem;opacity:.85}
+@media (min-width:640px){.item{grid-template-columns:110px 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="ttl">Tiempo de conquistar 2026<small>Tierra Alta · Campamento Internacional Guatemala</small></h1>
+  <button class="iconbtn" id="btnSearch" aria-label="Buscar persona">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+  </button>
+</header>
+
+<main id="app"></main>
+
+<nav class="tabs" id="tabs">
+  <button data-t="hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Hoy</button>
+  <button data-t="programa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Programa</button>
+  <button data-t="rally"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h12l-2 4 2 4H5"/></svg>Rally</button>
+  <button data-t="com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3 4 4 4 8a4 4 0 0 1-8 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 0-7z"/><path d="M6 21h12"/></svg>Comunión</button>
+  <button data-t="dep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3.5 9.5c4 1 13 1 17 0M3.5 14.5c4-1 13-1 17 0M12 3c-3 4-3 14 0 18M12 3c3 4 3 14 0 18"/></svg>Deportes</button>
+</nav>
+
+<script src="data.js"></script>
+<script>
+(function(){
+'use strict';
+const D = window.DATA;
+const $app = document.getElementById('app');
+const ICON_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>';
+const ICON_PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()
+  .replace(/\bhn(o|a|os|as)\b\.?/g,' ').replace(/\s+/g,' ').trim();
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('camp26.'+k); return v == null ? d : v; } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('camp26.'+k, v); } catch(e){} }
+};
+
+// ── tiempo ──
+const toMin = t => { const m = String(t).replace('.',':').match(/(\d{1,2}):(\d{2})/); return m ? (+m[1])*60 + (+m[2]) : null; };
+function range(h){
+  const parts = String(h).split('-');
+  const a = toMin(parts[0]); let b = parts[1] ? toMin(parts[1]) : null;
+  if (b == null) b = a != null ? a + 30 : null;
+  return [a, b];
+}
+function todayISO(){ const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function nowMin(){ const d = new Date(); return d.getHours()*60 + d.getMinutes(); }
+function sortedItems(day){ return day.items.map((it,i)=>({...it,_i:i,_r:range(it.h)})).sort((x,y)=>(x._r[0]-y._r[0]) || (x._i-y._i)); }
+function currentDay(){
+  const t = todayISO();
+  return D.programa.find(d => d.fecha === t) || null;
+}
+
+// ── render helpers ──
+function whoLine(r){ return r ? `<div class="who">${ICON_USER}<span>${esc(r)}</span></div>` : ''; }
+const VER_LBL = { 'rally':'Ver rally', 'com':'Ver Comunión.com', 'dep-jue':'Ver deportes del jueves', 'dep-vs':'Ver deportes', 'plen':'Ver estaciones' };
+function verBtn(v, dayId){
+  if (!v) return '';
+  let target = v;
+  if (v === 'dep-vs') target = 'dep/' + (dayId === 'sab' ? 'sab' : 'vie');
+  if (v === 'dep-jue') target = 'dep/jue';
+  if (v === 'plen') target = 'rally/plen';
+  return `<button class="link" data-go="${target}">${VER_LBL[v]} →</button>`;
+}
+function itemHTML(it, dayId, state){
+  const [a,b] = it._r || range(it.h);
+  return `<div class="item ${state||''}">
+    <div class="time">${esc(it.h)}</div>
+    <div>
+      <div class="act">${esc(it.a)}${state==='now'?'<span class="badge">Ahora</span>':''}</div>
+      ${it.l ? `<div class="meta">${esc(it.l)}</div>` : ''}
+      ${whoLine(it.r)}
+      ${it.d ? `<div class="desc">${esc(it.d)}</div>` : ''}
+      ${verBtn(it.ver, dayId)}
+    </div></div>`;
+}
+function people(arr){ return arr && arr.length ? `<div class="people">${arr.map(p=>`<span>${esc(p)}</span>`).join('')}</div>` : '<div class="meta">—</div>'; }
+function seg(items, on, attr){ return `<div class="seg">${items.map(([k,l])=>`<button data-${attr}="${k}" class="${k===on?'on':''}">${esc(l)}</button>`).join('')}</div>`; }
+
+// ── vistas ──
+function viewHoy(){
+  const day = currentDay();
+  let html = `<div class="card install" id="installCard"><p>Instala la app para usarla sin internet.</p><button id="btnInstall">Instalar</button></div>`;
+  if (!day){
+    const first = D.programa[0], t = todayISO();
+    const msg = t < first.fecha ? `El campamento empieza el ${first.dia.toLowerCase()} ${first.fechaTxt}.` : 'El campamento ya terminó. ¡Gracias por servir!';
+    html += `<div class="hero"><div class="lbl">Campamento 2026</div><div class="big">${esc(D.titulo)}</div><div class="sub">${esc(msg)}</div></div>`;
+    html += `<h3>Accesos rápidos</h3><div class="list">` + D.programa.map(d=>`<div class="item"><div class="time">${esc(d.dia)}<small>${esc(d.fechaTxt)}</small></div><div><div class="act">${d.items.length} actividades</div><button class="link" data-go="programa/${d.id}">Ver programa →</button></div></div>`).join('') + `</div>`;
+    return html;
+  }
+  const items = sortedItems(day), n = nowMin();
+  const now = items.filter(it => it._r[0] != null && it._r[0] <= n && n < it._r[1]);
+  const next = items.filter(it => it._r[0] != null && it._r[0] > n);
+  const nextStart = next.length ? next[0]._r[0] : null;
+  const nextGroup = next.filter(it => it._r[0] === nextStart);
+  html += `<div class="hero">
+    <div class="lbl">${esc(day.dia)} ${esc(day.fechaTxt)} · Ahora</div>
+    ${now.length ? now.map(it=>`<div class="big">${esc(it.a)}</div><div class="sub">${esc(it.h)}${it.l?' · '+esc(it.l):''}${it.r?' · '+esc(it.r):''}</div>`).join('') : '<div class="big">Sin actividad en este momento</div>'}
+    ${nextGroup.length ? `<div class="next"><div class="lbl">Siguiente</div>${nextGroup.map(it=>`<div><b>${esc(it.h)}</b> · ${esc(it.a)}${it.r?' — '+esc(it.r):''}</div>`).join('')}</div>` : ''}
+  </div>`;
+  html += `<h3>Programa de hoy</h3><div class="list">` + items.map(it => {
+    const st = (it._r[0] <= n && n < it._r[1]) ? 'now' : (it._r[1] <= n ? 'past' : '');
+    return itemHTML(it, day.id, st);
+  }).join('') + `</div>`;
+  if (day.notas) html += notasHTML(day.notas);
+  return html;
+}
+function notasHTML(nt){
+  return `<h3>${esc(nt.titulo)}</h3><div class="list">` + nt.lista.map(([t,r,d])=>`<div class="item" style="grid-template-columns:1fr"><div><div class="act">${esc(t)}</div>${whoLine(r)}${d?`<div class="desc">${esc(d)}</div>`:''}</div></div>`).join('') + `</div>` + (nt.pie ? `<p class="meta">${esc(nt.pie)}</p>` : '');
+}
+function viewPrograma(sub){
+  const cur = currentDay();
+  const id = sub || (cur ? cur.id : D.programa[0].id);
+  const day = D.programa.find(d=>d.id===id) || D.programa[0];
+  const isToday = cur && cur.id === day.id, n = nowMin();
+  let html = seg(D.programa.map(d=>[d.id, d.dia + ' ' + d.fechaTxt.split(' ')[0]]), day.id, 'day');
+  html += `<h2>${esc(day.dia)} ${esc(day.fechaTxt)}</h2><div class="list">` + sortedItems(day).map(it=>{
+    const st = isToday ? ((it._r[0] <= n && n < it._r[1]) ? 'now' : '') : '';
+    return itemHTML(it, day.id, st);
+  }).join('') + `</div>`;
+  if (day.notas) html += notasHTML(day.notas);
+  return html;
+}
+
+const TEAMS = (() => { const s = new Set(); D.rally.rondas[0].forEach(p=>p.forEach(t=>s.add(t))); return [...s].sort((a,b)=>a.localeCompare(b,'es')); })();
+function agenda(team){
+  return D.rally.rondas.map((r,ri)=>{ for (let e=0;e<r.length;e++){ const [a,b]=r[e]; if (a===team) return {r:ri+1,e:e+1,vs:b}; if (b===team) return {r:ri+1,e:e+1,vs:a}; } return {r:ri+1,e:null,vs:null}; });
+}
+function viewRally(sub){
+  const mode = sub || store.get('rallyMode','equipo');
+  let html = `<h2>Rally · viernes 9:30–13:00</h2><p class="meta" style="margin-top:-6px">20 equipos · 10 estaciones · 10 rondas. Cada equipo pasa por las 10 estaciones y no repite rival. Coordinan: Hnos. Enríquez.</p>`;
+  html += seg([['equipo','Mi equipo'],['ronda','Por ronda'],['estacion','Por estación'],['plen','Sábado: plenarias']], mode, 'rm');
+  if (mode === 'equipo'){
+    const team = store.get('team', '');
+    html += `<div class="chips" style="margin-bottom:12px">${TEAMS.map(t=>`<button data-team="${esc(t)}" class="${t===team?'on':''}">${esc(t)}</button>`).join('')}</div>`;
+    if (!team) html += `<div class="empty">Elige tu equipo para ver su recorrido.</div>`;
+    else html += `<div class="list"><table><thead><tr><th>Ronda</th><th>Estación</th><th>Rival</th></tr></thead><tbody>${agenda(team).map(x=>`<tr><td class="num">R${x.r}</td><td><span class="num-badge">${x.e}</span>Estación ${x.e}</td><td><b>${esc(x.vs)}</b></td></tr>`).join('')}</tbody></table></div>`;
+  } else if (mode === 'ronda'){
+    const r = +store.get('ronda','1');
+    const team = store.get('team','');
+    html += seg(D.rally.rondas.map((_,i)=>[String(i+1),'Ronda '+(i+1)]), String(r), 'ronda');
+    html += `<div class="list"><table><thead><tr><th>Est.</th><th>Enfrentamiento</th></tr></thead><tbody>${D.rally.rondas[r-1].map(([a,b],e)=>`<tr class="${(a===team||b===team)?'mine':''}"><td class="num">E${e+1}</td><td><b>${esc(a)}</b><span class="vs">vs</span><b>${esc(b)}</b></td></tr>`).join('')}</tbody></table></div>`;
+  } else if (mode === 'estacion'){
+    const e = +store.get('estacion','1');
+    const team = store.get('team','');
+    html += seg(D.rally.rondas[0].map((_,i)=>[String(i+1),'Estación '+(i+1)]), String(e), 'est');
+    html += `<div class="list"><table><thead><tr><th>Ronda</th><th>Enfrentamiento en estación ${e}</th></tr></thead><tbody>${D.rally.rondas.map((r,ri)=>{ const [a,b]=r[e-1]; return `<tr class="${(a===team||b===team)?'mine':''}"><td class="num">R${ri+1}</td><td><b>${esc(a)}</b><span class="vs">vs</span><b>${esc(b)}</b></td></tr>`; }).join('')}</tbody></table></div>`;
+  } else {
+    const P = D.plenarias;
+    html += `<h2>Rally / plenarias · sábado 14:00–18:00</h2><p class="meta" style="margin-top:-6px">5 estaciones, rotación cada 48 minutos.</p>`;
+    html += `<div class="list">${P.estaciones.map(s=>`<div class="item"><div class="time">Estación ${s.n}</div><div><div class="act">${esc(s.tema)}</div><div class="meta">${ICON_PIN.replace('<svg','<svg style="width:13px;height:13px;vertical-align:-2px"')} ${esc(s.lugar)}</div>${whoLine(s.r)}</div></div>`).join('')}</div>`;
+    html += `<h3>Turnos</h3><div class="list"><table><tbody>${P.horarios.map((h,i)=>`<tr><td class="num">Turno ${i+1}</td><td>${esc(h)}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  return html;
+}
+
+function viewCom(){
+  const C = D.comunion;
+  let html = `<h2>Comunión.com</h2><p class="meta" style="margin-top:-6px">Jueves, viernes y sábado · 21:00–23:30 · Diferentes áreas</p>`;
+  html += `<details class="card"><summary>Instrucciones (${C.instrucciones.length})</summary><ol class="steps" style="margin-top:10px">${C.instrucciones.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></details>`;
+  html += `<div class="list">${C.actividades.map(x=>`<div class="item" style="grid-template-columns:1fr"><div>
+    <div class="act">${x.n?`<span class="num-badge" title="No. en el mapa">${esc(x.n)}</span>`:''}${esc(x.a)}</div>
+    ${x.l?`<div class="meta">${esc(x.l)}</div>`:''}
+    ${people(x.e)}
+    ${x.o?`<div class="desc">${esc(x.o)}</div>`:''}
+  </div></div>`).join('')}</div><p class="meta">El número naranja es el número de la actividad en el mapa.</p>`;
+  return html;
+}
+
+function viewDep(sub){
+  const d = sub || (currentDay() && ['jue','vie','sab'].includes(currentDay().id) ? currentDay().id : 'jue');
+  let html = seg([['jue','Jueves · llegada'],['vie','Viernes tarde'],['sab','Sábado mañana']], d, 'dep');
+  if (d === 'jue'){
+    const J = D.deportesJueves;
+    html += `<h2>Deportes · jueves 10:00–12:00</h2><p class="meta" style="margin-top:-6px">Mientras llegan los camperos.</p>`;
+    html += `<details class="card"><summary>Instrucciones</summary><ol class="steps" style="margin-top:10px">${J.instrucciones.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></details>`;
+    html += `<div class="list">${J.actividades.map(x=>`<div class="item" style="grid-template-columns:1fr"><div><div class="act">${esc(x.a)}</div>${x.l?`<div class="meta">${esc(x.l)}</div>`:''}${people(x.e)}${x.o?`<div class="desc">${esc(x.o)}</div>`:''}</div></div>`).join('')}</div>`;
+  } else {
+    const V = D.deportesVS, key = d;
+    html += `<h2>Deportes · ${d==='vie'?'viernes 15:00–18:00':'sábado 9:00–12:45'}</h2>`;
+    html += `<p class="meta" style="margin-top:-6px">Piscinas: ${d==='vie'?'mujeres y tobogán hombres 15:00–16:45 · hombres y tobogán mujeres 16:45–18:15. Caminata 15:00–17:30.':'hombres y tobogán mujeres 9:00–10:45 · mujeres y tobogán hombres 10:45–12:30. Caminata 9:00–12:00.'}</p>`;
+    html += `<details class="card"><summary>Instrucciones</summary><ol class="steps" style="margin-top:10px">${V.instrucciones.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></details>`;
+    html += `<div class="list">${V.actividades.filter(x=>x[key].length).map(x=>`<div class="item" style="grid-template-columns:1fr"><div><div class="act">${esc(x.a)}</div>${x.l?`<div class="meta">${esc(x.l)}</div>`:''}${people(x[key])}${x.o?`<div class="desc">${esc(x.o)}</div>`:''}${x.st?`<div class="meta" style="color:var(--accent)">★ Recoger stickers (calcomanías) de su deporte</div>`:''}</div></div>`).join('')}</div>`;
+  }
+  return html;
+}
+
+// ── búsqueda por persona ──
+function buildIndex(){
+  const idx = [];
+  D.programa.forEach(day=>{
+    day.items.forEach(it=>{ if (it.r) idx.push({txt:it.r, sec:'Programa · '+day.dia, t:it.a, s:[it.h, it.l].filter(Boolean).join(' · '), go:'programa/'+day.id}); });
+    if (day.notas) day.notas.lista.forEach(([t,r])=>idx.push({txt:r, sec:'Programa · '+day.dia, t, s:day.notas.titulo, go:'programa/'+day.id}));
+  });
+  D.plenarias.estaciones.forEach(s=>idx.push({txt:s.r, sec:'Plenarias · sábado 14:00–18:00', t:'Estación '+s.n+': '+s.tema, s:s.lugar, go:'rally/plen'}));
+  D.comunion.actividades.forEach(x=>x.e.forEach(p=>idx.push({txt:p, sec:'Comunión.com · jue/vie/sáb 21:00', t:x.a, s:x.l, go:'com'})));
+  D.deportesJueves.actividades.forEach(x=>x.e.forEach(p=>idx.push({txt:p, sec:'Deportes · jueves 10:00', t:x.a, s:x.l, go:'dep/jue'})));
+  D.deportesVS.actividades.forEach(x=>{
+    x.vie.forEach(p=>idx.push({txt:p, sec:'Deportes · viernes tarde', t:x.a, s:x.l, go:'dep/vie'}));
+    x.sab.forEach(p=>idx.push({txt:p, sec:'Deportes · sábado mañana', t:x.a, s:x.l, go:'dep/sab'}));
+  });
+  idx.forEach(e=>e.n = norm(e.txt));
+  return idx;
+}
+let INDEX = null;
+function viewBuscar(){
+  const q = store.get('q','');
+  return `<h2>¿Qué me toca?</h2><div class="search"><input id="q" type="search" placeholder="Escribe un nombre o apellido (ej. Garache)" value="${esc(q)}" autocomplete="off"></div><div id="res"></div>`;
+}
+function runSearch(q){
+  store.set('q', q);
+  const el = document.getElementById('res'); if (!el) return;
+  const toks = norm(q).split(' ').filter(t=>t.length>1);
+  if (!toks.length){ el.innerHTML = `<div class="empty">Busca a cualquier persona para ver todas sus responsabilidades: programa, comunión.com, deportes y plenarias.</div>`; return; }
+  INDEX = INDEX || buildIndex();
+  const hits = INDEX.filter(e => toks.every(t => e.n.includes(t)));
+  if (!hits.length){ el.innerHTML = `<div class="empty">No se encontró “${esc(q)}”.</div>`; return; }
+  const seen = new Set(), out = [];
+  hits.forEach(h=>{ const k = h.sec+'|'+h.t+'|'+h.txt; if (!seen.has(k)){ seen.add(k); out.push(h); } });
+  el.innerHTML = `<p class="meta">${out.length} resultado${out.length>1?'s':''}</p><div class="list">${out.map(h=>`<div class="item" style="grid-template-columns:1fr"><div>
+    <div class="res-sec">${esc(h.sec)}</div><div class="act">${esc(h.t)}</div>${h.s?`<div class="meta">${esc(h.s)}</div>`:''}${whoLine(h.txt)}
+    <button class="link" data-go="${h.go}">Abrir →</button></div></div>`).join('')}</div>`;
+}
+
+// ── router ──
+const VIEWS = { hoy:viewHoy, programa:viewPrograma, rally:viewRally, com:viewCom, dep:viewDep, buscar:viewBuscar };
+function route(){
+  const [tab, sub] = (location.hash.slice(1) || 'hoy').split('/');
+  const fn = VIEWS[tab] || viewHoy;
+  $app.innerHTML = fn(sub);
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.t === tab));
+  if (tab === 'buscar'){ const i = document.getElementById('q'); runSearch(i.value); i.addEventListener('input', ()=>runSearch(i.value)); if (!i.value) i.focus(); }
+  showInstall();
+}
+function go(h){ if (location.hash.slice(1) === h) route(); else location.hash = h; window.scrollTo(0,0); }
+
+document.getElementById('tabs').addEventListener('click', e=>{ const b = e.target.closest('button'); if (b) go(b.dataset.t); });
+document.getElementById('btnSearch').addEventListener('click', ()=>go('buscar'));
+$app.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if (!b) return;
+  const ds = b.dataset;
+  if (ds.go) return go(ds.go);
+  if (ds.day) return go('programa/'+ds.day);
+  if (ds.dep) return go('dep/'+ds.dep);
+  if (ds.rm){ store.set('rallyMode', ds.rm); return go('rally/'+ds.rm); }
+  if (ds.team){ store.set('team', ds.team === store.get('team','') ? '' : ds.team); return route(); }
+  if (ds.ronda){ store.set('ronda', ds.ronda); return route(); }
+  if (ds.est){ store.set('estacion', ds.est); return route(); }
+  if (b.id === 'btnInstall' && deferred){ deferred.prompt(); deferred.userChoice.finally(()=>{ deferred = null; showInstall(); }); }
+});
+window.addEventListener('hashchange', route);
+
+// refresca "Ahora" cada minuto
+setInterval(()=>{ const t = (location.hash.slice(1)||'hoy').split('/')[0]; if (t==='hoy' || t==='programa') route(); }, 60000);
+
+// ── instalación / offline ──
+let deferred = null;
+function showInstall(){ const c = document.getElementById('installCard'); if (c) c.classList.toggle('show', !!deferred); }
+window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferred = e; showInstall(); });
+if ('serviceWorker' in navigator) window.addEventListener('load', ()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+route();
+})();
+</script>
+</body>
+</html>
